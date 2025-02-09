@@ -95,19 +95,9 @@ You should get a response that looks like this:
 ```
 Look for the hexadecimal numbers associated with the _id variables. One of those should be the box you're looking for!
 
-### 4. Create Your `.env` File
+### 4. Modify the `.env` File
 
-In the project directory, create a `.env` file and add:
-
-```
-NAME_OF_SENDER = 'your_name_just_for_personalization'
-EMAIL_ADDRESS='your_email@gmail.com'
-EMAIL_PASSWORD='your_google_app_password'
-LOVEBOX_API_KEY='your_lovebox_api_key'
-LOVEBOX_RECIPIENT_NAME = 'recipient_name_just_for_personalization'
-LOVEBOX_RECIPIENT_ID='your_lovebox_recipient_id'
-OPENAI_API_KEY='your_openai_api_key'
-```
+Use the API keys / tokens and ID from the last steps to modify the .env file.
 
 ### 5. Customize the Prompts
 
