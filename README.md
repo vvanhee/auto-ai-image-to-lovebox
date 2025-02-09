@@ -1,7 +1,7 @@
 # Auto AI Image To Lovebox
 Automatically send daily generated images from OpenAI's DALL-E to your loved one's Lovebox using APIs
 
-Welcome to **Auto AI Image to Lovebox** — a semi-automated way to express love for your significant other without lifting a finger (well, almost). This script generates adorable AI-created images and sends them straight to your partner's Lovebox. Because nothing says "romance" like delegating affection to artificial intelligence.
+Welcome to **Auto AI Image to Lovebox** — a semi-automated way to express love for your significant other without lifting a finger (well, almost). This script generates amazing AI-created images and sends them straight to your partner's Lovebox. Because nothing says "romance" like delegating affection to artificial intelligence.
 
 ## Features
 
