@@ -95,7 +95,7 @@ You should get a response that looks like this:
 ```
 Look for the hexadecimal numbers associated with the _id variables. One of those should be the box you're looking for!
 
-### 4. Modify the `.env` File
+### 4. Download the files here to their own directory and modify the `.env` File
 
 Use the API keys / tokens and ID from the last steps to modify the .env file.
 
