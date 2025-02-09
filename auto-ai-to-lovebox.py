@@ -51,6 +51,7 @@ def generate_prompt():
 def generate_image():
     prompt = generate_prompt()
     print(prompt)
+    # Believe it or not, the following addition is needed to avoid substantial alterations in the prompt, and is included in the DALL-E documentation at https://platform.openai.com/docs/guides/images
     prompt = "I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail, just use it AS-IS: " + prompt
 
     response = requests.post(
