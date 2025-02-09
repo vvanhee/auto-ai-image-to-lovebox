@@ -5,7 +5,7 @@ Welcome to **Auto AI Image to Lovebox** — a semi-automated way to express love
 
 ## Features
 
-- Generates cute cartoon images based on random prompts.
+- Generates images of you and your loved one (or whatever you want) based on random prompts.
 - Sends images directly to your Lovebox.
 - Emails you a confirmation with the image and prompt details.
 - Retries on failure and keeps you in the loop if something breaks (because love is about communication).
