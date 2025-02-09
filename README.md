@@ -1,4 +1,4 @@
-# auto-ai-image-to-lovebox
+# Auto AI Image To Lovebox
 Automatically send daily generated images from OpenAI's DALL-E to your loved one's Lovebox using APIs
 
 Welcome to **Auto AI Image to Lovebox** — a semi-automated way to express love for your significant other without lifting a finger (well, almost). This script generates adorable AI-created images and sends them straight to your partner's Lovebox. Because nothing says "romance" like delegating affection to artificial intelligence.
@@ -47,8 +47,10 @@ pip install requests python-dotenv
 
 #### Lovebox API Key & Recipient ID
 
-1. Create a Lovebox account. The easiest way to do this is to [download the Lovebox app](https://en.lovebox.love/pages/app). Make sure to set up your Lovebox in the app and send at least one message.
-2. Get your API key / token and the ID of the Lovebox or phone widget you want to send to.
+##### Create a Lovebox account.
+The easiest way to do this is to [download the Lovebox app](https://en.lovebox.love/pages/app). Make sure to set up your Lovebox in the app and send at least one message.
+
+##### Get your API key / token and the ID of the Lovebox or phone widget you want to send to.
 First, get the token with the following command. Replace the e-mail and password with your e-mail and password associated with your Lovebox account.
 
 ```bash
@@ -72,7 +74,8 @@ You will get a response that looks like this:
 }
 ```
 The token is your API key for Lovebox.
-3. Find your sweetheart's **Recipient ID** (probably your partner's box, but double-check unless you want to surprise a stranger).
+
+##### Find your sweetheart's **Recipient ID** (probably your partner's box, but double-check unless you want to surprise a stranger).
 Use the following command, replacing the part after Bearer with your token from the last step.
 ```bash
 curl --location --request POST 'https://app-api.loveboxlove.com/v1/graphql' \
@@ -108,7 +111,7 @@ OPENAI_API_KEY='your_openai_api_key'
 
 **Important:** Add `.env` to your `.gitignore` file to avoid accidentally sharing your secrets with the world, if for some reason you're planning to post this to Github.
 
-### 5. Customize Your Prompts
+### 5. Customize the Prompts
 
 The current script generates images that are supposed to look like **me and my wife**. Unless you want daily pictures of two strangers (which, hey, no judgment), you'll want to tweak the prompt in the `generate_prompt()` function in `auto-ai-to-lovebox.py`.
 
@@ -119,7 +122,7 @@ You can also modify the following text files to create more personalized prompts
 - `messages.txt`
 - `textStyles.txt`
 
-### 6. Set Up as a Daily Service
+### 5. Set Up as a Daily Service
 
 Want to automate this to run daily? Here's how:
 
@@ -173,7 +176,7 @@ sudo systemctl start lovebox.timer
 
 ---
 
-## Important Notes
+### Important Notes
 
 - **Testing:** Make sure to thoroughly test your prompts. Weird things can happen when AI interprets your love.
 - **Cost Awareness:** With the current OpenAI pricing, each image costs \$0.08. Daily love could cost you \~\$2.50/month. Plan (and love) responsibly.
@@ -181,13 +184,13 @@ sudo systemctl start lovebox.timer
 
 ---
 
-## Contributing
+### Contributing
 
 Feel free to fork this repo and add more features, like sending randomized poetry or automating "I’m sorry" messages (kidding... mostly).
 
 ---
 
-## License
+### License
 
 This project is licensed under the MIT License. Use it, modify it, and remember: even though AI can automate affection, **it’s the thought that counts**. 
 
