@@ -109,8 +109,6 @@ LOVEBOX_RECIPIENT_ID='your_lovebox_recipient_id'
 OPENAI_API_KEY='your_openai_api_key'
 ```
 
-**Important:** Add `.env` to your `.gitignore` file to avoid accidentally sharing your secrets with the world, if for some reason you're planning to post this to Github.
-
 ### 5. Customize the Prompts
 
 The current script generates images that are supposed to look like **me and my wife**. Unless you want daily pictures of two strangers (which, hey, no judgment), you'll want to tweak the prompt in the `generate_prompt()` function in `auto-ai-to-lovebox.py`.
