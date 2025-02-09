@@ -122,7 +122,7 @@ You can also modify the following text files to create more personalized prompts
 - `messages.txt`
 - `textStyles.txt`
 
-### 5. Set Up as a Daily Service
+### 6. Set Up as a Daily Service
 
 Want to automate this to run daily? Here's how:
 
