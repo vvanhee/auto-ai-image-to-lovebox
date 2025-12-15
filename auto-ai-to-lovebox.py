@@ -10,6 +10,9 @@ from datetime import datetime
 import random
 import time
 from dotenv import load_dotenv
+from google import genai
+from google.genai import types
+from PIL import Image
 
 # Load environment variables from .env file
 load_dotenv()
@@ -23,7 +26,7 @@ EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
 LOVEBOX_API_KEY = os.getenv('LOVEBOX_API_KEY')
 LOVEBOX_RECIPIENT_NAME = os.getenv('LOVEBOX_RECIPIENT_NAME')
 LOVEBOX_RECIPIENT_ID = os.getenv('LOVEBOX_RECIPIENT_ID')
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
 # Retry configuration
 RETRY_DELAY = 15  # seconds
@@ -40,50 +43,58 @@ def generate_prompt():
     setting = get_random_line('settings.txt')
     message = get_random_line('messages.txt')
     text_style = get_random_line('textStyles.txt')
+    image_style = get_random_line('imageStyles.txt')
+    more_style = get_random_line('moreStyles.txt')
 
-    prompt = (f"A cute cartoon illustration of a man in his 40s wearing glasses, thin, white, brunette, smooth chin, brown eyes. "
-              f"He is with his wife, an Asian woman with bright purple, pink, and blue hair, cat ears, and brown eyes. "
+    prompt = (f"A {image_style} of this man and his wife."
               f"They are {activity} in {setting}. {text_style} \"{message}\". "
-              f"The style contains chibi and kawaii elements and bright colors, hearts and lots of love and excitement.")
+              f"{more_style}")
     return prompt
 
-# Function to generate image using OpenAI API
+# Function to generate image using Gemini API
 def generate_image():
     prompt = generate_prompt()
     print(prompt)
-    # Believe it or not, the following addition is needed to avoid substantial alterations in the prompt, and is included in the DALL-E documentation at https://platform.openai.com/docs/guides/images
-    prompt = "I NEED to test how the tool works with extremely simple prompts. DO NOT add any detail, just use it AS-IS: " + prompt
+    
+    # Get random image from images directory
+    image_dir = 'images'
+    if not os.path.exists(image_dir):
+        return None, f"Error: {image_dir} directory not found"
+        
+    images = [f for f in os.listdir(image_dir) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))]
+    if not images:
+        return None, "Error: No images found in images directory"
+        
+    random_image_file = random.choice(images)
+    image_path = os.path.join(image_dir, random_image_file)
+    print(f"Using image: {image_path}")
 
-    response = requests.post(
-        'https://api.openai.com/v1/images/generations',
-        headers={
-            'Authorization': f'Bearer {OPENAI_API_KEY}',
-            'Content-Type': 'application/json'
-        },
-        json={
-            'model': 'dall-e-3',
-            'prompt': prompt,
-            'quality': 'standard',
-            'n': 1,
-            'size': '1792x1024'
-        }
-    )
+    try:
+        image = Image.open(image_path)
+        
+        client = genai.Client(api_key=GEMINI_API_KEY)
+        
+        response = client.models.generate_content(
+            model="gemini-2.5-flash-image",
+            contents=[prompt, image],
+        )
+        
+        generated_image_saved = False
+        if response.parts:
+            for part in response.parts:
+                if part.inline_data is not None:
+                    img = part.as_image()
+                    img.save("daily_image.png")
+                    generated_image_saved = True
+                    break
+        
+        if not generated_image_saved:
+             return None, "Error: No image generated in response"
 
-    if response.status_code != 200:
-        error_message = f"Error: Received status code {response.status_code} from OpenAI Image API\n{response.text}"
-        print(error_message)
-        return None, error_message
+        return prompt, None
 
-    response_json = response.json()
-    image_url = response_json['data'][0].get('url')
-    if not image_url:
-        return None, "Error: No image URL found in the response"
-
-    image_data = requests.get(image_url).content
-    with open('daily_image.png', 'wb') as f:
-        f.write(image_data)
-
-    return prompt, None
+    except Exception as e:
+        return None, f"Error generating image: {str(e)}"
 
 # Function to send image to Lovebox
 def send_to_lovebox():

@@ -1,5 +1,5 @@
 # Auto AI Image To Lovebox
-Automatically send daily generated images from OpenAI's DALL-E to your loved one's Lovebox using APIs
+Automatically send daily generated images from Google's Gemini to your loved one's Lovebox using APIs
 
 Welcome to **Auto AI Image to Lovebox** — a semi-automated way to express love for your significant other without lifting a finger (well, almost). This script generates amazing AI-created images and sends them straight to your partner's Lovebox. Because nothing says "romance" like delegating affection to artificial intelligence.
 
@@ -10,7 +10,7 @@ Welcome to **Auto AI Image to Lovebox** — a semi-automated way to express love
 - Emails you a confirmation with the image and prompt details.
 - Retries on failure and keeps you in the loop if something breaks (because love is about communication).
 
-> **Important:** As of this script's publication, **each image costs about \$0.08** through OpenAI's API. This can add up faster than you think. Test your prompts thoroughly before letting the AI run wild with your wallet!
+> **Important:** Check [Gemini API pricing](https://ai.google.dev/pricing) for current rates. Test your prompts thoroughly before letting the AI run wild with your wallet!
 
 ---
 
@@ -20,7 +20,7 @@ Welcome to **Auto AI Image to Lovebox** — a semi-automated way to express love
 
 - A **Linux** machine (because Windows doesn't deserve this kind of love).
 - A **Lovebox** account with API access.
-- An **OpenAI** account with credits.
+- A **Google Cloud** project with Gemini API enabled.
 - A **Google** account (for sending confirmation emails).
 
 ### 2. Install Required Packages
@@ -28,16 +28,15 @@ Welcome to **Auto AI Image to Lovebox** — a semi-automated way to express love
 Make sure you have Python installed, then run:
 
 ```bash
-pip install requests python-dotenv
+pip install requests python-dotenv google-genai pillow
 ```
 
 ### 3. Get Your API Keys
 
-#### OpenAI API Key
+#### Gemini API Key
 
-1. Create an account at [OpenAI](https://openai.com/).
-2. Add some credits [on OpenAI's billing page](https://platform.openai.com/settings/organization/billing/overview) (because love—and AI—isn't free).
-3. Create an API key from the [OpenAI API Keys](https://platform.openai.com/settings/organization/api-keys) page.
+1. Go to [Google AI Studio](https://aistudio.google.com/).
+2. Create an API key.
 
 #### Google App Password
 
@@ -167,7 +166,7 @@ sudo systemctl start lovebox.timer
 ### Important Notes
 
 - **Testing:** Make sure to thoroughly test your prompts. Weird things can happen when AI interprets your love.
-- **Cost Awareness:** With the current OpenAI pricing, each image costs \$0.08. Daily love could cost you \~\$2.50/month. Plan (and love) responsibly.
+- **Cost Awareness:** Check Gemini pricing. Plan (and love) responsibly.
 - **Failures Happen:** The script retries once if something fails and emails you about it if it still doesn't work. Even AI can't always get things right on the first try—just like relationships.
 
 ---
