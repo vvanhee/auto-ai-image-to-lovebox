@@ -25,11 +25,24 @@ Welcome to **Auto AI Image to Lovebox** — a semi-automated way to express love
 
 ### 2. Install Required Packages
 
-Make sure you have Python installed, then run:
+On newer Linux distributions (like Ubuntu 24.04+), you should use a virtual environment to avoid conflicts with system packages.
 
-```bash
-pip install requests python-dotenv google-genai pillow
-```
+1.  **Create a virtual environment:**
+    ```bash
+    python3 -m venv venv
+    ```
+
+2.  **Activate the virtual environment:**
+    ```bash
+    source venv/bin/activate
+    ```
+
+3.  **Install the dependencies:**
+    ```bash
+    pip install requests python-dotenv google-genai pillow
+    ```
+
+    *Note: If you ever need to run the script manually, remember to activate the environment first!*
 
 ### 3. Get Your API Keys
 
@@ -126,8 +139,9 @@ Add the following:
 Description=Auto AI to Lovebox Service
 
 [Service]
-ExecStart=/usr/bin/python3 /path/to/auto-ai-to-lovebox.py
-WorkingDirectory=/path/to/
+# Point to the python executable INSIDE your virtual environment
+ExecStart=/path/to/auto-ai-image-to-lovebox/venv/bin/python3 /path/to/auto-ai-image-to-lovebox/auto-ai-to-lovebox.py
+WorkingDirectory=/path/to/auto-ai-image-to-lovebox/
 StandardOutput=journal
 
 [Install]
