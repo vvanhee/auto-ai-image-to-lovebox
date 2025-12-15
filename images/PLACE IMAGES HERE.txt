@@ -1,0 +1,1 @@
+Place your images in this directory. The script will pick a random image from here to use as input for the Gemini API.

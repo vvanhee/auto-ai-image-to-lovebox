@@ -48,6 +48,10 @@ coverage.xml
 *.cover
 *.py,cover
 .hypothesis/
+
+# Ignore images directory content but keep the placeholder
+images/*
+!images/PLACE IMAGES HERE.txt
 .pytest_cache/
 cover/
 
