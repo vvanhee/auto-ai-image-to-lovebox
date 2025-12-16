@@ -47,7 +47,8 @@ def generate_prompt():
     more_style = get_random_line('moreStyles.txt')
     date_str = datetime.now().strftime("%B %d, %Y")
     prompt = (f"A {image_style} of me and my wife. "
-              f"Make it include a loving message appropriate for {date_str}.")
+              f"Make it include a loving message appropriate for {date_str}. "
+              f"Ensure the output image is in landscape orientation.")
               # f"They are {activity} in {setting}. {text_style} \"{message}\". "
               # f"{more_style}")
     return prompt
