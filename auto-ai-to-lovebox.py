@@ -45,10 +45,9 @@ def generate_prompt():
     text_style = get_random_line('textStyles.txt')
     image_style = get_random_line('imageStyles.txt')
     more_style = get_random_line('moreStyles.txt')
-    date_str = datetime.now().strftime("%B %d, %Y")
-    prompt = (f"A {image_style} of me and my wife. "
-              f"Make it include a loving message appropriate for {date_str}. "
-              f"Ensure the output image is in landscape orientation.")
+    date_str = datetime.now().strftime("%B")
+    prompt = (f"A {image_style} of me and my wife. Her name is Ericka. "
+              f"Make it include a loving message to her in English appropriate for {date_str}. ")
               # f"They are {activity} in {setting}. {text_style} \"{message}\". "
               # f"{more_style}")
     return prompt
@@ -79,6 +78,11 @@ def generate_image():
         response = client.models.generate_content(
             model="gemini-2.5-flash-image",
             contents=[prompt, image],
+            config=types.GenerateContentConfig(
+                image_config=types.ImageConfig(
+                    aspect_ratio="4:3",
+                )
+            )
         )
         
         generated_image_saved = False

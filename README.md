@@ -139,8 +139,11 @@ Add the following:
 Description=Auto AI to Lovebox Service
 
 [Service]
-# Point to the python executable INSIDE your virtual environment
-ExecStart=/path/to/auto-ai-image-to-lovebox/venv/bin/python3 /path/to/auto-ai-image-to-lovebox/auto-ai-to-lovebox.py
+# Set the user to ensure correct permissions for your home directory and venv
+User=yourusername
+Group=yourusername
+# Use a shell command to explicitly activate the virtual environment before running the script
+ExecStart=/bin/bash -c "source /path/to/auto-ai-image-to-lovebox/venv/bin/activate && /path/to/auto-ai-image-to-lovebox/venv/bin/python3 /path/to/auto-ai-image-to-lovebox/auto-ai-to-lovebox.py"
 WorkingDirectory=/path/to/auto-ai-image-to-lovebox/
 StandardOutput=journal
 
@@ -161,7 +164,10 @@ Add:
 Description=Run Lovebox Script Daily
 
 [Timer]
-OnCalendar=*-*-* 08:00:00
+# Set the desired time (e.g., 10:00 AM)
+OnCalendar=*-*-* 10:00:00
+# Force the timer to respect the system's local time zone (e.g., America/Chicago)
+Timezone=America/Chicago 
 Persistent=true
 
 [Install]
