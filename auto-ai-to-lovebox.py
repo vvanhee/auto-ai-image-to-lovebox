@@ -48,7 +48,7 @@ def generate_prompt():
     image_style = get_random_line('imageStyles.txt')
     more_style = get_random_line('moreStyles.txt')
 
-    prompt = (f"A {image_style} of me and my Asian wife. Her name is Ericka. "
+    prompt = (f"A {image_style} of me and my wife. Her name is Ericka. "
               f"Search for an interesting national or international holiday for today and "
               f"make the image relevant to the holiday, with us performing relevant activities. "
               f"Also include a funny short message to her in English appropriate for the holiday. ")
