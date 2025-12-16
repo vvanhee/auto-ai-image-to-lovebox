@@ -2,6 +2,7 @@ import smtplib
 import requests
 import os
 import base64
+import argparse
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
@@ -26,6 +27,7 @@ EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
 LOVEBOX_API_KEY = os.getenv('LOVEBOX_API_KEY')
 LOVEBOX_RECIPIENT_NAME = os.getenv('LOVEBOX_RECIPIENT_NAME')
 LOVEBOX_RECIPIENT_ID = os.getenv('LOVEBOX_RECIPIENT_ID')
+LOVEBOX_RECIPIENT_ID2 = os.getenv('LOVEBOX_RECIPIENT_ID2')
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
 # Retry configuration
@@ -45,9 +47,11 @@ def generate_prompt():
     text_style = get_random_line('textStyles.txt')
     image_style = get_random_line('imageStyles.txt')
     more_style = get_random_line('moreStyles.txt')
-    date_str = datetime.now().strftime("%B")
-    prompt = (f"A {image_style} of me and my wife. Her name is Ericka. "
-              f"Make it include a loving message to her in English appropriate for {date_str}. ")
+
+    prompt = (f"A {image_style} of me and my Asian wife. Her name is Ericka. "
+              f"Search for an interesting national or international holiday for today and "
+              f"make the image relevant to the holiday, with us performing relevant activities. "
+              f"Also include a funny short message to her in English appropriate for the holiday. ")
               # f"They are {activity} in {setting}. {text_style} \"{message}\". "
               # f"{more_style}")
     return prompt
@@ -60,11 +64,11 @@ def generate_image():
     # Get random image from images directory
     image_dir = 'images'
     if not os.path.exists(image_dir):
-        return None, f"Error: {image_dir} directory not found"
+        return None, None, f"Error: {image_dir} directory not found"
         
     images = [f for f in os.listdir(image_dir) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp'))]
     if not images:
-        return None, "Error: No images found in images directory"
+        return None, None, "Error: No images found in images directory"
         
     random_image_file = random.choice(images)
     image_path = os.path.join(image_dir, random_image_file)
@@ -76,34 +80,39 @@ def generate_image():
         client = genai.Client(api_key=GEMINI_API_KEY)
         
         response = client.models.generate_content(
-            model="gemini-2.5-flash-image",
+            model="gemini-3-pro-image-preview",
             contents=[prompt, image],
             config=types.GenerateContentConfig(
+                response_modalities=['TEXT', 'IMAGE'],
+                tools=[{"google_search": {}}],
                 image_config=types.ImageConfig(
                     aspect_ratio="4:3",
+                    image_size="1K"
                 )
             )
         )
         
         generated_image_saved = False
+        generated_text = ""
         if response.parts:
             for part in response.parts:
                 if part.inline_data is not None:
                     img = part.as_image()
                     img.save("daily_image.png")
                     generated_image_saved = True
-                    break
+                if part.text:
+                    generated_text += part.text + "\n"
         
         if not generated_image_saved:
-             return None, "Error: No image generated in response"
+             return None, None, "Error: No image generated in response"
 
-        return prompt, None
+        return prompt, generated_text, None
 
     except Exception as e:
-        return None, f"Error generating image: {str(e)}"
+        return None, None, f"Error generating image: {str(e)}"
 
 # Function to send image to Lovebox
-def send_to_lovebox():
+def send_to_lovebox(recipient_id):
     if not os.path.exists('daily_image.png'):
         return False, "Image not found. Aborting sending to Lovebox."
 
@@ -125,7 +134,7 @@ def send_to_lovebox():
                 }
             ''',
             'variables': {
-                'recipient': LOVEBOX_RECIPIENT_ID,
+                'recipient': recipient_id,
                 'base64': encoded_image
             }
         }
@@ -166,27 +175,41 @@ def cleanup_files():
         os.remove('daily_image.png')
 
 # Run the full process with retry logic
-def run_process():
-    prompt, error = generate_image()
-    if not prompt:
+def run_process(recipient_id):
+    prompt, generated_text, error = generate_image()
+    if error:
         time.sleep(RETRY_DELAY)
-        prompt, error = generate_image()
-        if not prompt:
+        prompt, generated_text, error = generate_image()
+        if error:
             send_email("Lovebox image failed!", f"Image generation failed after two attempts.\n\nError: {error}")
             return
 
-    success, send_error = send_to_lovebox()
+    success, send_error = send_to_lovebox(recipient_id)
     if not success:
         time.sleep(RETRY_DELAY)
-        success, send_error = send_to_lovebox()
+        success, send_error = send_to_lovebox(recipient_id)
         if not success:
             send_email("Lovebox image failed!", f"Image sending to Lovebox failed after two attempts.\n\nError: {send_error}")
             cleanup_files()
             return
 
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    send_email("Lovebox image sent!", f"Hi {NAME_OF_SENDER} - Your Lovebox image was sent to {LOVEBOX_RECIPIENT_NAME} on {current_time}!\n\nPrompt used to generate the image:\n{prompt}", attach_image=True)
+    body = f"Hi {NAME_OF_SENDER} - Your Lovebox image was sent to {LOVEBOX_RECIPIENT_NAME} on {current_time}!\n\nPrompt used to generate the image:\n{prompt}"
+    if generated_text:
+        body += f"\n\nModel Output:\n{generated_text}"
+        
+    send_email("Lovebox image sent!", body, attach_image=True)
     cleanup_files()
 
 # Execute the process
-run_process()
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Send AI generated image to Lovebox.')
+    parser.add_argument('--id2', action='store_true', help='Use the second recipient ID')
+    args = parser.parse_args()
+
+    recipient_id = LOVEBOX_RECIPIENT_ID2 if args.id2 else LOVEBOX_RECIPIENT_ID
+    
+    if not recipient_id:
+        print("Error: Recipient ID not found in environment variables.")
+    else:
+        run_process(recipient_id)
