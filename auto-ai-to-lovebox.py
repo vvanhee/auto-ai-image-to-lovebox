@@ -1,6 +1,8 @@
 import smtplib
 import requests
 import os
+import json
+import hashlib
 import base64
 import argparse
 from email.mime.multipart import MIMEMultipart
@@ -33,11 +35,90 @@ GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 # Retry configuration
 RETRY_DELAY = 15  # seconds
 
+CYCLE_STATE_FILENAME = ".cycle_state.json"
+CYCLE_STATE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), CYCLE_STATE_FILENAME)
+
+
+def _read_non_empty_lines(filename):
+    with open(filename, 'r', encoding='utf-8') as file:
+        return [line.strip() for line in file if line.strip()]
+
+
+def _load_cycle_state():
+    try:
+        if not os.path.exists(CYCLE_STATE_PATH):
+            return {}
+        with open(CYCLE_STATE_PATH, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+            return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
+def _save_cycle_state(state):
+    try:
+        with open(CYCLE_STATE_PATH, 'w', encoding='utf-8') as file:
+            json.dump(state, file, indent=2)
+        return True
+    except Exception:
+        return False
+
+
+def _items_signature(items):
+    normalized = "\n".join(sorted(items))
+    return hashlib.sha256(normalized.encode('utf-8')).hexdigest()
+
+
+def shuffle_cycle_choice(key, items):
+    unique_items = list(dict.fromkeys(items))
+    if not unique_items:
+        raise ValueError("No items available for shuffle cycle")
+
+    signature = _items_signature(unique_items)
+    state = _load_cycle_state()
+    entry = state.get(key)
+
+    if (
+        not isinstance(entry, dict)
+        or entry.get('signature') != signature
+        or not isinstance(entry.get('order'), list)
+        or len(entry.get('order')) != len(unique_items)
+    ):
+        order = unique_items[:]
+        random.shuffle(order)
+        entry = {'signature': signature, 'order': order, 'index': 0}
+        state[key] = entry
+
+    order = entry['order']
+    index = entry.get('index', 0)
+    if not isinstance(index, int) or index < 0:
+        index = 0
+
+    if index >= len(order):
+        order = unique_items[:]
+        random.shuffle(order)
+        entry['order'] = order
+        index = 0
+
+    choice = order[index]
+    entry['index'] = index + 1
+    state[key] = entry
+
+    if not _save_cycle_state(state):
+        return random.choice(unique_items)
+
+    return choice
+
 # Function to read a random line from a file
 def get_random_line(filename):
-    with open(filename, 'r') as file:
-        lines = [line.strip() for line in file if line.strip()]
+    lines = _read_non_empty_lines(filename)
     return random.choice(lines)
+
+
+def get_shuffle_cycle_line(filename):
+    lines = _read_non_empty_lines(filename)
+    key = f"file:{os.path.basename(filename)}"
+    return shuffle_cycle_choice(key, lines)
 
 # Function to generate prompt
 def generate_prompt():
@@ -45,7 +126,7 @@ def generate_prompt():
     setting = get_random_line('settings.txt')
     message = get_random_line('messages.txt')
     text_style = get_random_line('textStyles.txt')
-    image_style = get_random_line('imageStyles.txt')
+    image_style = get_shuffle_cycle_line('imageStyles.txt')
     more_style = get_random_line('moreStyles.txt')
 
     prompt = (f"A {image_style} of me and my wife. Her name is Ericka. "
@@ -70,7 +151,7 @@ def generate_image():
     if not images:
         return None, None, "Error: No images found in images directory"
         
-    random_image_file = random.choice(images)
+    random_image_file = shuffle_cycle_choice('images_dir:images', images)
     image_path = os.path.join(image_dir, random_image_file)
     print(f"Using image: {image_path}")
 
