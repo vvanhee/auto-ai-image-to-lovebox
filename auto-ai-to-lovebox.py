@@ -129,10 +129,13 @@ def generate_prompt():
     image_style = get_shuffle_cycle_line('imageStyles.txt')
     more_style = get_random_line('moreStyles.txt')
 
-    prompt = (f"A {image_style} of me and my wife. Her name is Ericka. "
+    prompt = (f"A cute single panel cartoon of me (a caucasian man named Victor) and my wife "
+              f"(an Asian woman named Ericka). "
               f"Search for an interesting national or international holiday for today and "
-              f"make the image relevant to the holiday, with us performing relevant activities. "
-              f"Also include a funny short message to her in English appropriate for the holiday. ")
+              f"the weather in Minneapolis and current events and make the image relevant to "
+              f"the holiday or the weather or current events, "
+              f"with us performing relevant and interesting activities. Use the images to see what we look like. "
+              f"Also include a funny and witty short caption in English appropriate for the theme. ")
               # f"They are {activity} in {setting}. {text_style} \"{message}\". "
               # f"{more_style}")
     return prompt
@@ -168,7 +171,7 @@ def generate_image():
                 tools=[{"google_search": {}}],
                 image_config=types.ImageConfig(
                     aspect_ratio="4:3",
-                    image_size="1K"
+                    image_size="2K"
                 )
             )
         )
