@@ -28,3 +28,53 @@ a moonlit forest clearing with fireflies dancing and a gentle mist rolling over 
 a hidden lagoon with crystal-clear water reflecting the surrounding cliffs covered in lush greenery
 a steampunk cityscape with towering gears, steam-powered vehicles, and brass bridges stretching between buildings
 a glowing cave filled with luminescent crystals and underground rivers that sparkle like stardust
+Living room
+Kitchen
+Bathroom
+Bedroom
+Office cubicle
+School classroom
+School hallway
+Library reading room
+Grocery store aisle
+Parking lot
+Bus stop
+Subway platform
+Train station waiting area
+Airport gate
+Airport security line
+Hotel lobby
+Hotel room
+Elevator interior
+Office conference room
+Office break room
+Coffee shop seating area
+Fast food restaurant dining area
+Public park bench area
+Playground
+Sidewalk along a residential street
+Suburban backyard
+Laundry room
+Laundromat
+Basement storage room
+Garage
+Pharmacy counter
+Doctor’s waiting room
+Dentist office exam room
+Gym locker room
+Shopping mall corridor
+Clothing store fitting room
+Movie theater lobby
+Post office line
+Bank teller line
+City bus interior
+Taxi back seat
+Ride-share pickup curb
+Vending machine area
+Apartment stairwell
+Apartment hallway
+Recycling center drop-off area
+Community center meeting room
+School cafeteria
+Gas station convenience store
+Hardware store aisle

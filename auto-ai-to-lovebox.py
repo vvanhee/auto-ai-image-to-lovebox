@@ -129,14 +129,16 @@ def generate_prompt():
     image_style = get_shuffle_cycle_line('imageStyles.txt')
     more_style = get_random_line('moreStyles.txt')
 
-    prompt = (f"A cute single panel cartoon of me (a caucasian man named Victor) and my wife "
+    prompt = (f"A cute rom-com cartoon of me (a brown eyed caucasian man named Victor) and my wife "
               f"(an Asian woman named Ericka). "
+              #f"Make a witty and sweet caption that talks about how much i missed her.")
               f"Search for an interesting national or international holiday for today and "
-              f"the weather in Minneapolis and current events and make the image relevant to "
-              f"the holiday or the weather or current events, "
-              f"with us performing relevant and interesting activities. Use the images to see what we look like. "
-              f"Also include a funny and witty short caption in English appropriate for the theme. ")
-              # f"They are {activity} in {setting}. {text_style} \"{message}\". "
+              f"make us doing something silly that relates to "
+              f"the holiday and the date today. "
+              #f"with us performing relevant and interesting activities. Use the images to see what we look like. "
+              f"{text_style}: a funny and sweet and witty message in English or "
+              f"dialogue appropriate for the theme of the cartoon. "
+              f"Setting: {setting}. ")
               # f"{more_style}")
     return prompt
 
