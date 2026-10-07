@@ -244,17 +244,19 @@ def _extract_json(text):
 def run_director(client, ingredients):
     """Ask the text model for a brief. Tries the richest config first, then simpler fallbacks."""
     prompt = build_director_prompt(ingredients)
-    search_tool = types.Tool(google_search=types.GoogleSearch())
+    # Configs are built lazily (inside the try) so an older google-genai SDK that doesn't know
+    # e.g. thinking_level just falls through to a simpler attempt instead of crashing the run.
     attempts = [
-        dict(tools=[search_tool], temperature=1.0, thinking_config=types.ThinkingConfig(thinking_level="high")),
-        dict(tools=[search_tool], temperature=1.0),
-        dict(temperature=1.0),
+        lambda: dict(tools=[types.Tool(google_search=types.GoogleSearch())], temperature=1.0,
+                     thinking_config=types.ThinkingConfig(thinking_level="high")),
+        lambda: dict(tools=[types.Tool(google_search=types.GoogleSearch())], temperature=1.0),
+        lambda: dict(temperature=1.0),
     ]
     last_error = None
-    for config in attempts:
+    for make_config in attempts:
         try:
             response = client.models.generate_content(
-                model=DIRECTOR_MODEL, contents=prompt, config=types.GenerateContentConfig(**config))
+                model=DIRECTOR_MODEL, contents=prompt, config=types.GenerateContentConfig(**make_config()))
             brief = _extract_json(response.text)
             if not brief.get('scene'):
                 raise ValueError("Director brief missing 'scene'")
