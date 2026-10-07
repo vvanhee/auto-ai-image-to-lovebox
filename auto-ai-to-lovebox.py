@@ -43,7 +43,7 @@ DIRECTOR_MODEL = os.getenv('DIRECTOR_MODEL', 'gemini-3.8-flash')
 IMAGE_MODELS = [m.strip() for m in os.getenv(
     'IMAGE_MODELS', 'gemini-3-pro-image,gemini-3-pro-image-preview').split(',') if m.strip()]
 HOME_LOCATION = os.getenv('HOME_LOCATION', '')        # e.g. "Minneapolis, Minnesota" — for seasons/weather jokes
-MAX_REFERENCE_IMAGES = int(os.getenv('MAX_REFERENCE_IMAGES', '3'))
+MAX_REFERENCE_IMAGES = max(1, int(os.getenv('MAX_REFERENCE_IMAGES', '1')))  # 1 = least confusing for the model
 HISTORY_LENGTH = int(os.getenv('HISTORY_LENGTH', '30'))  # recent ideas the director must not repeat
 
 # Retry configuration
@@ -321,7 +321,7 @@ def build_image_prompt(brief, style, ref_count):
     return f"""Create an illustration in this art style: {style}.
 
 THE PEOPLE — LIKENESS IS THE TOP PRIORITY
-The {ref_count} attached photo(s) show Victor and Ericka.
+{'The attached photo shows' if ref_count == 1 else f'The {ref_count} attached photos show'} Victor and Ericka.
 {read_couple_notes('looks')}
 Draw them so anyone who knows them would recognize them instantly: carry over their real face shapes, eyes, noses, smiles, hairstyles and hair colors, any glasses or facial hair, skin tones, builds and their height difference — translated into the art style the way a skilled caricaturist or portrait illustrator would. Do not swap in generic stock cartoon faces. Use the photos ONLY for their likeness: ignore the photos' clothing, poses, backgrounds, lighting and photographic look.
 

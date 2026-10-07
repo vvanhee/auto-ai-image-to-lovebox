@@ -116,7 +116,7 @@ Use the API keys / tokens and ID from the last steps to modify the .env file.
 Each day runs in two stages:
 
 1. **Art director (text model).** The script deals a random *concept format* (`concepts.txt`), *art style* (`imageStyles.txt`), *mood* (`moods.txt`), two optional *sparks* (`sparks.txt`) and a *sentiment* (`messages.txt`). A Gemini text model (with Google Search, for date hooks) brainstorms several ideas from those ingredients, picks the clearest one, and writes a single coherent brief: scene, composition and the exact on-image text. It also sees the last 30 ideas (`.history.json`) so it doesn't repeat itself.
-2. **Illustrator (image model).** The brief, the style, and up to 3 reference photos from `images/` go to the image model with strict likeness instructions (stylized but recognizable, never photorealistic).
+2. **Illustrator (image model).** The brief, the style, and one reference photo from `images/` go to the image model with strict likeness instructions (stylized but recognizable, never photorealistic).
 
 Concepts, styles, sparks and reference photos are dealt like a shuffled deck: nothing repeats until the whole list has been used.
 
@@ -128,7 +128,7 @@ Files you'll want to edit (lines starting with `#` are ignored):
 - `moods.txt`, `sparks.txt`, `messages.txt`.
 - `images/` — add several clear, well-lit photos where your faces are visible (solo shots work too). More variety in the references = better likeness. Use JPG/PNG/WebP; iPhone HEIC files are skipped.
 
-Optional `.env` settings: `DIRECTOR_MODEL` (default `gemini-3.8-flash`), `IMAGE_MODELS` (comma-separated, tried in order; default `gemini-3-pro-image,gemini-3-pro-image-preview`), `HOME_LOCATION` (e.g. `Minneapolis, Minnesota`, for seasonal/weather jokes), `MAX_REFERENCE_IMAGES` (default 3), `HISTORY_LENGTH` (default 30).
+Optional `.env` settings: `DIRECTOR_MODEL` (default `gemini-3.8-flash`), `IMAGE_MODELS` (comma-separated, tried in order; default `gemini-3-pro-image,gemini-3-pro-image-preview`), `HOME_LOCATION` (e.g. `Minneapolis, Minnesota`, for seasonal/weather jokes), `MAX_REFERENCE_IMAGES` (default 1; more photos tended to blend the faces), `HISTORY_LENGTH` (default 30).
 
 Trying it out without sending anything:
 
