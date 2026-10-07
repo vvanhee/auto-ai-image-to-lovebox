@@ -261,6 +261,15 @@ def _extract_json(text):
     return json.loads(cleaned[start:end + 1])
 
 
+def _no_afc():
+    """We never use automatic function calling (Python functions as tools); turning it off
+    explicitly silences the SDK's 'Direct use of automatic function calling' warning."""
+    try:
+        return {'automatic_function_calling': types.AutomaticFunctionCallingConfig(disable=True)}
+    except Exception:
+        return {}
+
+
 def run_director(client, ingredients):
     """Ask the text model for a brief. Tries the richest config first, then simpler fallbacks."""
     prompt = build_director_prompt(ingredients)
@@ -268,9 +277,9 @@ def run_director(client, ingredients):
     # e.g. thinking_level just falls through to a simpler attempt instead of crashing the run.
     attempts = [
         lambda: dict(tools=[types.Tool(google_search=types.GoogleSearch())], temperature=1.0,
-                     thinking_config=types.ThinkingConfig(thinking_level="high")),
-        lambda: dict(tools=[types.Tool(google_search=types.GoogleSearch())], temperature=1.0),
-        lambda: dict(temperature=1.0),
+                     thinking_config=types.ThinkingConfig(thinking_level="high"), **_no_afc()),
+        lambda: dict(tools=[types.Tool(google_search=types.GoogleSearch())], temperature=1.0, **_no_afc()),
+        lambda: dict(temperature=1.0, **_no_afc()),
     ]
     last_error = None
     for make_config in attempts:
@@ -350,6 +359,7 @@ def render_image(client, image_prompt, ref_paths, out_path):
                 config=types.GenerateContentConfig(
                     response_modalities=['TEXT', 'IMAGE'],
                     image_config=types.ImageConfig(aspect_ratio="4:3", image_size="2K"),
+                    **_no_afc(),
                 ),
             )
             text_out = ""
