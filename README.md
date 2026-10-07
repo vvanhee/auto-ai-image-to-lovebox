@@ -39,7 +39,7 @@ On newer Linux distributions (like Ubuntu 24.04+), you should use a virtual envi
 
 3.  **Install the dependencies:**
     ```bash
-    pip install requests python-dotenv google-genai pillow
+    pip install -r requirements.txt
     ```
 
     *Note: If you ever need to run the script manually, remember to activate the environment first!*
@@ -113,14 +113,29 @@ Use the API keys / tokens and ID from the last steps to modify the .env file.
 
 ### 5. Customize the Prompts
 
-The current script generates images that are supposed to look like **me and my wife**. Unless you want daily pictures of two strangers (which, hey, no judgment), you'll want to tweak the prompt in the `generate_prompt()` function in `auto-ai-to-lovebox.py`.
+Each day runs in two stages:
 
-You can also modify the following text files to create more personalized prompts. The script will take a random line from each to add to the prompt:
+1. **Art director (text model).** The script deals a random *concept format* (`concepts.txt`), *art style* (`imageStyles.txt`), *mood* (`moods.txt`), two optional *sparks* (`sparks.txt`) and a *sentiment* (`messages.txt`). A Gemini text model (with Google Search, for date hooks) brainstorms several ideas from those ingredients, picks the clearest one, and writes a single coherent brief: scene, composition and the exact on-image text. It also sees the last 30 ideas (`.history.json`) so it doesn't repeat itself.
+2. **Illustrator (image model).** The brief, the style, and one reference photo from `images/` go to the image model with strict likeness instructions (stylized but recognizable, never photorealistic).
 
-- `activities.txt`
-- `settings.txt`
-- `messages.txt`
-- `textStyles.txt`
+Concepts, styles, sparks and reference photos are dealt like a shuffled deck: nothing repeats until the whole list has been used.
+
+Files you'll want to edit (lines starting with `#` are ignored):
+
+- `couple.txt` — **the most important file for likeness.** Describe each person concretely (hair, glasses, facial hair, build, height difference) and add inside jokes, pets, hobbies and places. Use `## Looks` lines for appearance (sent to the image model) and `## Life` lines for interests and inside jokes (sent only to the art director, so the image model doesn't cram every hobby into every picture). Put your real details in `couple.private.txt` (git-ignored); when it exists it's used instead of `couple.txt`.
+- `concepts.txt` — formats like "movie poster", "three-panel comic", "museum placard", "tiny people in a giant kitchen".
+- `imageStyles.txt` — illustrated styles only; photographic styles tend to produce strangers.
+- `moods.txt`, `sparks.txt`, `messages.txt`.
+- `images/` — add several clear, well-lit photos where your faces are visible (solo shots work too). More variety in the references = better likeness. Use JPG/PNG/WebP; iPhone HEIC files are skipped.
+
+Optional `.env` settings: `DIRECTOR_MODEL` (default `gemini-3.8-flash`), `IMAGE_MODELS` (comma-separated, tried in order; default `gemini-3-pro-image,gemini-3-pro-image-preview`), `HOME_LOCATION` (e.g. `Minneapolis, Minnesota`, for seasonal/weather jokes), `MAX_REFERENCE_IMAGES` (default 1; more photos tended to blend the faces), `HISTORY_LENGTH` (default 30).
+
+Trying it out without sending anything:
+
+```bash
+python3 auto-ai-to-lovebox.py --dry-run      # just print today's brief and image prompt
+python3 auto-ai-to-lovebox.py --preview 5    # render 5 images into previews/ (no Lovebox, no email)
+```
 
 ### 6. Set Up as a Daily Service
 

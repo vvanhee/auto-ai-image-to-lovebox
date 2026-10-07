@@ -1,0 +1,20 @@
+# WHO'S IN THE PICTURE. Lines starting with # are ignored.
+#
+# Two sections:
+#   ## Looks  -> sent to BOTH the art director and the image model (likeness)
+#   ## Life   -> sent ONLY to the art director (ideas, inside jokes) so the image model
+#                doesn't cram every hobby into every picture
+#
+# Likeness tips: hair color / length / texture, facial hair, glasses (shape/color), face shape,
+#   build, relative heights, signature accessories.
+# Life tips: pets, hobbies, favorite foods, places you love, running jokes, dates that matter.
+#
+# This repo is public, so put the real details in couple.private.txt (git-ignored);
+# when it exists, it's used INSTEAD of this file.
+
+## Looks
+Victor: a brown-eyed white man.
+Ericka: an Asian woman.
+
+## Life
+They are married and live together.

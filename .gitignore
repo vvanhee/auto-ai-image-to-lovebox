@@ -176,3 +176,11 @@ cython_debug/
 
 # Local shuffle-cycle state
 .cycle_state.json
+
+# Lovebox generator state / private notes
+.cycle_state.json
+.history.json
+previews/
+couple.private.txt
+daily_image.png
+.env
