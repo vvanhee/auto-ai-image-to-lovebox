@@ -122,11 +122,11 @@ Concepts, styles, sparks and reference photos are dealt like a shuffled deck: no
 
 Files you'll want to edit (lines starting with `#` are ignored):
 
-- `couple.txt` — **the most important file for likeness.** Describe each person concretely (hair, glasses, facial hair, build, height difference) and add inside jokes, pets, hobbies and places. Put private details in `couple.private.txt` (git-ignored); it's read the same way.
+- `couple.txt` — **the most important file for likeness.** Describe each person concretely (hair, glasses, facial hair, build, height difference) and add inside jokes, pets, hobbies and places. Use `## Looks` lines for appearance (sent to the image model) and `## Life` lines for interests and inside jokes (sent only to the art director, so the image model doesn't cram every hobby into every picture). Put your real details in `couple.private.txt` (git-ignored); when it exists it's used instead of `couple.txt`.
 - `concepts.txt` — formats like "movie poster", "three-panel comic", "museum placard", "tiny people in a giant kitchen".
 - `imageStyles.txt` — illustrated styles only; photographic styles tend to produce strangers.
 - `moods.txt`, `sparks.txt`, `messages.txt`.
-- `images/` — add several clear, well-lit photos where your faces are visible (solo shots work too). More variety in the references = better likeness.
+- `images/` — add several clear, well-lit photos where your faces are visible (solo shots work too). More variety in the references = better likeness. Use JPG/PNG/WebP; iPhone HEIC files are skipped.
 
 Optional `.env` settings: `DIRECTOR_MODEL` (default `gemini-3.8-flash`), `IMAGE_MODELS` (comma-separated, tried in order; default `gemini-3-pro-image,gemini-3-pro-image-preview`), `HOME_LOCATION` (e.g. `Minneapolis, Minnesota`, for seasonal/weather jokes), `MAX_REFERENCE_IMAGES` (default 3), `HISTORY_LENGTH` (default 30).
 

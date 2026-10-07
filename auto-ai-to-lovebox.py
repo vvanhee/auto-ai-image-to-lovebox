@@ -140,8 +140,28 @@ def deal(filename, count=1):
     return shuffle_cycle_choice(f"file:{os.path.basename(filename)}", lines, count)
 
 
-def read_couple_notes():
-    lines = _read_non_empty_lines('couple.txt') + _read_non_empty_lines('couple.private.txt')
+def read_couple_notes(section=None):
+    """Read couple.private.txt if it exists (git-ignored, real details), else couple.txt.
+    Lines under a '## Looks' heading go to both the director and the image model; lines under
+    '## Life' go ONLY to the director (so the image model doesn't cram every hobby into every
+    picture). Lines before any heading count as Looks. Other lines starting with # are comments.
+    section=None returns everything; 'looks' or 'life' returns just that part."""
+    filename = 'couple.private.txt' if os.path.exists('couple.private.txt') else 'couple.txt'
+    parts = {'looks': [], 'life': []}
+    current = 'looks'
+    if os.path.exists(filename):
+        with open(filename, 'r', encoding='utf-8') as file:
+            for raw in file:
+                line = raw.strip()
+                if line.startswith('##'):
+                    current = 'life' if 'life' in line.lower() else 'looks'
+                elif line and not line.startswith('#'):
+                    parts[current].append(line)
+    if section:
+        lines = parts[section]
+    else:
+        lines = (["Appearance:"] + parts['looks'] if parts['looks'] else []) + \
+                (["Their life together:"] + parts['life'] if parts['life'] else [])
     return "\n".join(lines) if lines else "Victor (a man) and his wife Ericka (a woman)."
 
 
@@ -292,7 +312,8 @@ def build_image_prompt(brief, style, ref_count):
     return f"""Create an illustration in this art style: {style}.
 
 THE PEOPLE — LIKENESS IS THE TOP PRIORITY
-The {ref_count} attached photo(s) show Victor and Ericka. {read_couple_notes()}
+The {ref_count} attached photo(s) show Victor and Ericka.
+{read_couple_notes('looks')}
 Draw them so anyone who knows them would recognize them instantly: carry over their real face shapes, eyes, noses, smiles, hairstyles and hair colors, any glasses or facial hair, skin tones, builds and their height difference — translated into the art style the way a skilled caricaturist or portrait illustrator would. Do not swap in generic stock cartoon faces. Use the photos ONLY for their likeness: ignore the photos' clothing, poses, backgrounds, lighting and photographic look.
 
 THE SCENE
