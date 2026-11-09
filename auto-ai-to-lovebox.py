@@ -1,6 +1,7 @@
 import smtplib
 import requests
 import os
+import io
 import re
 import json
 import hashlib
@@ -16,7 +17,7 @@ import time
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-from PIL import Image
+from PIL import Image, ImageOps
 
 # Always work relative to the script's folder (systemd, cron, etc.)
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -43,7 +44,8 @@ DIRECTOR_MODEL = os.getenv('DIRECTOR_MODEL', 'gemini-3.8-flash')
 IMAGE_MODELS = [m.strip() for m in os.getenv(
     'IMAGE_MODELS', 'gemini-3-pro-image,gemini-3-pro-image-preview').split(',') if m.strip()]
 HOME_LOCATION = os.getenv('HOME_LOCATION', '')        # e.g. "Minneapolis, Minnesota" — for seasons/weather jokes
-MAX_REFERENCE_IMAGES = max(1, int(os.getenv('MAX_REFERENCE_IMAGES', '1')))  # 1 = least confusing for the model
+MAX_REFERENCE_IMAGES = max(1, int(os.getenv('MAX_REFERENCE_IMAGES', '14')))  # 14 = Gemini image API maximum
+REFERENCE_MAX_SIDE = 1536  # downscale photos so up to 14 fit in one request
 HISTORY_LENGTH = int(os.getenv('HISTORY_LENGTH', '30'))  # recent ideas the director must not repeat
 
 # Retry configuration
@@ -321,9 +323,10 @@ def build_image_prompt(brief, style, ref_count):
     return f"""Create an illustration in this art style: {style}.
 
 THE PEOPLE — LIKENESS IS THE TOP PRIORITY
-{'The attached photo shows' if ref_count == 1 else f'The {ref_count} attached photos show'} Victor and Ericka.
+{'The attached photo shows' if ref_count == 1 else f'The {ref_count} attached photos are all reference photos of the same two people,'} Victor and Ericka.{'' if ref_count == 1 else ' Some photos show both of them, some show only one.'}
 {read_couple_notes('looks')}
-Draw them so anyone who knows them would recognize them instantly: carry over their real face shapes, eyes, noses, smiles, hairstyles and hair colors, any glasses or facial hair, skin tones, builds and their height difference — translated into the art style the way a skilled caricaturist or portrait illustrator would. Do not swap in generic stock cartoon faces. Use the photos ONLY for their likeness: ignore the photos' clothing, poses, backgrounds, lighting and photographic look.
+{'' if ref_count == 1 else '''Study EVERY photo before drawing. Cross-reference them to learn what stays the same for each person across all the photos — those consistent features are their true likeness. Ignore one-off differences caused by camera angle, lens distortion, lighting, filters, hats, sunglasses, expressions or older photos. If other people appear in any photo, ignore them: Victor and Ericka are the two who appear consistently. Keep the two of them distinct — never average or blend their faces together, and never mix one person's features into the other.
+'''}Draw them so anyone who knows them would recognize them instantly: carry over their real face shapes, eyes, noses, smiles, hairstyles and hair colors, any glasses or facial hair, skin tones, builds and their height difference — translated into the art style the way a skilled caricaturist or portrait illustrator would. Do not swap in generic stock cartoon faces. Use the photos ONLY for their likeness: ignore the photos' clothing, poses, backgrounds, lighting and photographic look. Before finishing, check each face against the photos: a close friend should recognize each of them at a glance.
 
 THE SCENE
 {brief.get('scene', '')}
@@ -348,8 +351,18 @@ def pick_reference_images(image_dir='images'):
     return [os.path.join(image_dir, f) for f in chosen]
 
 
+def load_reference_image(path):
+    """Upright, downscaled JPEG so many photos fit within the request size limit."""
+    with Image.open(path) as img:
+        img = ImageOps.exif_transpose(img).convert('RGB')
+        img.thumbnail((REFERENCE_MAX_SIDE, REFERENCE_MAX_SIDE))
+        buf = io.BytesIO()
+        img.save(buf, 'JPEG', quality=90)
+    return types.Part.from_bytes(data=buf.getvalue(), mime_type='image/jpeg')
+
+
 def render_image(client, image_prompt, ref_paths, out_path):
-    refs = [Image.open(p) for p in ref_paths]
+    refs = [load_reference_image(p) for p in ref_paths]
     last_error = None
     for model in IMAGE_MODELS:
         try:
