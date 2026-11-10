@@ -331,13 +331,12 @@ THE PEOPLE — LIKENESS IS THE TOP PRIORITY
 THE SCENE
 {brief.get('scene', '')}
 
-TEXT IN THE IMAGE (render exactly as written, spelled correctly, large and legible on a small screen; no other text)
+TEXT IN THE IMAGE (render exactly as written, spelled correctly, very large and legible on a small screen)
 {text_lines or '- (no text)'}
 
 RENDERING RULES
-- This is an illustration, NOT a photograph: no photorealism, no photographic skin or lighting, fully committed to the art style above.
-- One clear focal point, bold readable composition in landscape 4:3, both faces clearly visible.
-- No brand logos, trademarked characters, watermarks or signatures."""
+- Bold readable composition in landscape 4:3.
+"""
 
 
 def pick_reference_images(image_dir='images'):
